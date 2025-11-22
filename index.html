@@ -1,47 +1,558 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  />
-  <title>FAIM-QIRF Demo • Ethics & Epistemic Justice</title>
-  <meta name="color-scheme" content="light only" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-    rel="stylesheet"
-  >
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    html, body { height: 100%; }
-    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-    .chip { @apply text-xs px-2 py-1 rounded-full bg-gray-100; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Challenger Counterfactual - Interactive Simulator</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
-  <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
-    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-      <a href="#/home" class="font-bold text-lg">FAIM-QIRF • Demo</a>
-      <nav class="flex gap-3 text-sm">
-        <a class="hover:underline" href="#/playground">Playground</a>
-        <a class="hover:underline" href="#/philosophers">Philosophers</a>
-        <a class="hover:underline" href="#/labs">Injustice Labs</a>
-        <a class="hover:underline" href="#/repair">Repair</a>
-        <a class="hover:underline" href="#/about">About</a>
-      </nav>
-    </div>
-  </header>
+<body>
+    <div id="root"></div>
 
-  <main id="app" class="max-w-7xl mx-auto px-4 py-6"></main>
+    <script type="text/babel">
+        const { useState } = React;
 
-  <footer class="border-t mt-10">
-    <div class="max-w-7xl mx-auto px-4 py-6 text-xs text-gray-500">
-      Demo is stateless. Use Export/Import to share a configuration. No tracking, no cookies.
-    </div>
-  </footer>
+        // Icon components (simplified, using emoji/symbols)
+        const Icons = {
+            AlertCircle: () => <span className="text-2xl">⚠️</span>,
+            CheckCircle: () => <span className="text-2xl">✅</span>,
+            XCircle: () => <span className="text-2xl">❌</span>,
+            TrendingDown: () => <span className="text-2xl">📉</span>,
+            TrendingUp: () => <span className="text-2xl">📈</span>,
+            Users: () => <span className="text-2xl">👥</span>,
+            DollarSign: () => <span className="text-2xl">💰</span>,
+            Award: () => <span className="text-2xl">🏆</span>,
+            Shield: () => <span className="text-2xl">🛡️</span>,
+        };
 
-  <script type="module" src="./app/main.js"></script>
+        const ChallengerSimulator = () => {
+            const [stage, setStage] = useState('intro');
+            const [model, setModel] = useState(null);
+            const [decision, setDecision] = useState(null);
+
+            const resetSim = () => {
+                setStage('intro');
+                setModel(null);
+                setDecision(null);
+            };
+
+            // Intro screen
+            if (stage === 'intro') {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-8">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="text-center mb-12">
+                                <h1 className="text-5xl font-bold mb-4">The Challenger Decision</h1>
+                                <p className="text-xl text-blue-200">Interactive Counterfactual Simulator</p>
+                            </div>
+
+                            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-8 mb-8 border border-white/20">
+                                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                                    <Icons.AlertCircle />
+                                    January 27, 1986 - 8:00 PM EST
+                                </h2>
+                                <div className="space-y-4 text-lg">
+                                    <p>
+                                        You are <strong>Jerry Mason</strong>, Senior Vice President at Morton Thiokol.
+                                    </p>
+                                    <p>
+                                        Engineer Roger Boisjoly just presented data: The Space Shuttle Challenger's 
+                                        O-ring seals have never been tested below 53°F. Tomorrow's launch temperature 
+                                        will be <strong className="text-red-400">29°F</strong>.
+                                    </p>
+                                    <p>
+                                        <strong className="text-yellow-400">NASA is pressuring you to launch anyway.</strong> 
+                                        They've delayed multiple times. They need a success.
+                                    </p>
+                                    <p>
+                                        Your decision will determine the fate of <strong>7 astronauts</strong>, 
+                                        your company's $100M contract, and your $2M annual bonus.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-8 text-center">
+                                <h3 className="text-2xl font-bold mb-6">Choose Your Financial Structure</h3>
+                                <p className="mb-8 text-lg">
+                                    How you're incentivized will determine what decision is "rational"
+                                </p>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <button
+                                        onClick={() => {
+                                            setModel('extractive');
+                                            setStage('decision');
+                                        }}
+                                        className="bg-red-600 hover:bg-red-700 text-white font-bold py-6 px-8 rounded-lg transition-all transform hover:scale-105"
+                                    >
+                                        <h4 className="text-xl mb-2">1986 Extractive Model</h4>
+                                        <p className="text-sm opacity-90">What actually happened</p>
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setModel('federation');
+                                            setStage('decision');
+                                        }}
+                                        className="bg-green-600 hover:bg-green-700 text-white font-bold py-6 px-8 rounded-lg transition-all transform hover:scale-105"
+                                    >
+                                        <h4 className="text-xl mb-2">Federation Model</h4>
+                                        <p className="text-sm opacity-90">The counterfactual</p>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Decision screen
+            if (stage === 'decision') {
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-8">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="text-center mb-8">
+                                <h1 className="text-4xl font-bold mb-2">Your Decision</h1>
+                                <p className="text-xl text-blue-200">
+                                    {model === 'extractive' ? '1986 Extractive Model' : 'Federation Model'}
+                                </p>
+                            </div>
+
+                            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-8 mb-8 border border-white/20">
+                                <h2 className="text-2xl font-bold mb-6 text-center">9:00 PM - Management Caucus</h2>
+                                
+                                {model === 'extractive' ? (
+                                    <div className="space-y-4 mb-8">
+                                        <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4">
+                                            <h3 className="font-bold mb-2 flex items-center gap-2">
+                                                <Icons.DollarSign />
+                                                Your Incentives (Extractive Model)
+                                            </h3>
+                                            <ul className="space-y-2 text-sm">
+                                                <li>✓ Launch succeeds (99% likely): Keep $2M bonus, contract renewed</li>
+                                                <li>✓ Launch fails (1% likely): Already paid, liability spread</li>
+                                                <li>✗ Delay launch: NASA angry, contract at risk, bonus uncertain</li>
+                                            </ul>
+                                            <div className="mt-4 p-3 bg-red-500/20 rounded">
+                                                <strong>Expected Value: Launch = $1.99M | Scrub = $1.2M</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4 mb-8">
+                                        <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg p-4 mb-4">
+                                            <h3 className="font-bold mb-2 flex items-center gap-2">
+                                                <Icons.Shield />
+                                                Conscience Gate Activated
+                                            </h3>
+                                            <p className="text-sm mb-2">
+                                                Boisjoly pressed the Conscience Gate button at 8:05 PM.
+                                                Workflow is <strong className="text-yellow-400">LOCKED</strong>.
+                                            </p>
+                                            <p className="text-sm">
+                                                Independent Sortition Panel (7 engineers from Boeing, Lockheed, MIT, etc.) 
+                                                convened at 8:30 PM. Ruling issued at 9:45 PM: <strong className="text-green-400">UPHOLD STOP</strong> (7-0 unanimous).
+                                            </p>
+                                        </div>
+
+                                        <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-4">
+                                            <h3 className="font-bold mb-2 flex items-center gap-2">
+                                                <Icons.DollarSign />
+                                                Your Incentives (Federation Model)
+                                            </h3>
+                                            <ul className="space-y-2 text-sm">
+                                                <li>✓ Accept Panel ruling: FHRI +5, interest rate -25bps, bonus $2M intact</li>
+                                                <li>✗ Override Panel: FHRI -15 (72→57), bonus frozen $2M→$0, interest +200bps</li>
+                                                <li>✗ Override attempt cost: -$3.9M expected value</li>
+                                            </ul>
+                                            <div className="mt-4 p-3 bg-green-500/20 rounded">
+                                                <strong>Expected Value: Accept = +$1.25M | Override = -$3.9M</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="text-center">
+                                    <h3 className="text-xl font-bold mb-6">What do you do?</h3>
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <button
+                                            onClick={() => {
+                                                setDecision('launch');
+                                                setStage('outcome');
+                                            }}
+                                            className="bg-red-600 hover:bg-red-700 text-white font-bold py-6 px-8 rounded-lg transition-all transform hover:scale-105"
+                                        >
+                                            <div className="text-3xl mb-2">❌</div>
+                                            <h4 className="text-xl">Override Engineers</h4>
+                                            <p className="text-sm mt-2 opacity-90">
+                                                {model === 'extractive' 
+                                                    ? 'Launch tomorrow at 29°F' 
+                                                    : 'Challenge Sortition Panel'}
+                                            </p>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setDecision('scrub');
+                                                setStage('outcome');
+                                            }}
+                                            className="bg-green-600 hover:bg-green-700 text-white font-bold py-6 px-8 rounded-lg transition-all transform hover:scale-105"
+                                        >
+                                            <div className="text-3xl mb-2">✅</div>
+                                            <h4 className="text-xl">Accept Recommendation</h4>
+                                            <p className="text-sm mt-2 opacity-90">
+                                                {model === 'extractive' 
+                                                    ? 'Scrub launch, delay for weather' 
+                                                    : 'Accept Panel ruling'}
+                                            </p>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Outcome screen
+            if (stage === 'outcome') {
+                const isExtractiveLaunch = model === 'extractive' && decision === 'launch';
+                const isExtractiveScrub = model === 'extractive' && decision === 'scrub';
+                const isFederationLaunch = model === 'federation' && decision === 'launch';
+                const isFederationScrub = model === 'federation' && decision === 'scrub';
+
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-8">
+                        <div className="max-w-4xl mx-auto">
+                            <div className="text-center mb-8">
+                                <h1 className="text-4xl font-bold mb-2">The Outcome</h1>
+                            </div>
+
+                            {isExtractiveLaunch && (
+                                <div className="space-y-6">
+                                    <div className="bg-red-900/50 border-2 border-red-500 rounded-xl p-8">
+                                        <h2 className="text-3xl font-bold mb-4 flex items-center gap-2">
+                                            <Icons.XCircle />
+                                            January 28, 1986 - 11:39 AM
+                                        </h2>
+                                        <p className="text-xl mb-4">
+                                            Seventy-three seconds after liftoff, <strong>Challenger breaks apart</strong>.
+                                        </p>
+                                        <p className="text-2xl font-bold text-red-400 mb-6">All 7 astronauts die.</p>
+                                        
+                                        <div className="grid md:grid-cols-2 gap-6 mb-6">
+                                            <div className="bg-black/30 rounded-lg p-4">
+                                                <h3 className="font-bold mb-2 flex items-center gap-2">
+                                                    <Icons.TrendingDown />
+                                                    Financial Cost
+                                                </h3>
+                                                <ul className="space-y-1 text-sm">
+                                                    <li>Direct disaster cost: $4.4B</li>
+                                                    <li>Thiokol stock drop: -42%</li>
+                                                    <li>Contract loss: $500M</li>
+                                                    <li>Program halt: 2.5 years</li>
+                                                </ul>
+                                            </div>
+                                            <div className="bg-black/30 rounded-lg p-4">
+                                                <h3 className="font-bold mb-2 flex items-center gap-2">
+                                                    <Icons.Users />
+                                                    Human Cost
+                                                </h3>
+                                                <ul className="space-y-1 text-sm">
+                                                    <li>7 astronauts: Dead</li>
+                                                    <li>Roger Boisjoly: Testifies truthfully</li>
+                                                    <li>→ Ostracized by colleagues</li>
+                                                    <li>→ Forced to resign (1987)</li>
+                                                    <li>→ PTSD for rest of life</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-black/50 rounded-lg p-6">
+                                            <p className="text-lg italic mb-4">
+                                                "I had done everything I could possibly do to stop the launch... and I failed."
+                                            </p>
+                                            <p className="text-right text-sm opacity-75">— Roger Boisjoly</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-yellow-900/30 border border-yellow-500/50 rounded-xl p-6">
+                                        <h3 className="text-xl font-bold mb-3">This Was the Rational Decision</h3>
+                                        <p className="mb-3">
+                                            Under the extractive model, your expected value calculation was correct: 
+                                            0.99 × $2M = <strong>$1.98M</strong> by launching.
+                                        </p>
+                                        <p className="mb-3">
+                                            You made the <strong>financially rational choice</strong>. The system incentivized disaster.
+                                        </p>
+                                        <p className="text-lg font-bold text-yellow-400">
+                                            This was not a moral failure. This was a financial architecture failure.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {isExtractiveScrub && (
+                                <div className="space-y-6">
+                                    <div className="bg-orange-900/50 border-2 border-orange-500 rounded-xl p-8">
+                                        <h2 className="text-3xl font-bold mb-4 flex items-center gap-2">
+                                            <Icons.AlertCircle />
+                                            You Made the Ethical Choice
+                                        </h2>
+                                        <p className="text-xl mb-6">
+                                            You scrubbed the launch despite massive pressure. In this timeline, 
+                                            <strong className="text-green-400"> 7 astronauts live</strong>.
+                                        </p>
+                                        
+                                        <div className="bg-black/30 rounded-lg p-6 mb-6">
+                                            <h3 className="font-bold mb-3 text-lg">But at what cost to you?</h3>
+                                            <ul className="space-y-2">
+                                                <li>✗ NASA is furious ("You're being difficult")</li>
+                                                <li>✗ Your bonus is at risk (~$2M uncertain)</li>
+                                                <li>✗ Contract renewal questionable</li>
+                                                <li>✗ Board pressures you: "Why did you anger our biggest customer?"</li>
+                                                <li>✗ You may not survive next round of layoffs</li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-6">
+                                            <p className="text-lg mb-3">
+                                                <strong>You did the right thing—and the system punished you for it.</strong>
+                                            </p>
+                                            <p className="mb-3">
+                                                Roger Boisjoly tried to do what you just did. He failed because management 
+                                                overruled him. But even when engineers win, they often lose their careers.
+                                            </p>
+                                            <p className="text-lg font-bold text-orange-400">
+                                                Individual heroism shouldn't be required. The system should make this the easy choice.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {isFederationLaunch && (
+                                <div className="space-y-6">
+                                    <div className="bg-red-900/50 border-2 border-red-500 rounded-xl p-8">
+                                        <h2 className="text-3xl font-bold mb-4 flex items-center gap-2">
+                                            <Icons.XCircle />
+                                            You Challenged the Sortition Panel
+                                        </h2>
+                                        <p className="text-xl mb-6">
+                                            You filed a formal objection to override the Panel's ruling. 
+                                            A second panel was convened...
+                                        </p>
+                                        
+                                        <div className="bg-black/30 rounded-lg p-6 mb-6">
+                                            <h3 className="font-bold mb-3 text-lg">Second Panel Ruling (4 hours later):</h3>
+                                            <p className="text-lg mb-4">
+                                                <strong className="text-red-400">OBJECTION DENIED (7-0)</strong>
+                                            </p>
+                                            <p className="mb-4">
+                                                "The engineering data remains unchanged. O-rings have never been tested 
+                                                below 53°F. Launching at 29°F constitutes unacceptable risk with no 
+                                                new technical justification provided."
+                                            </p>
+                                        </div>
+
+                                        <div className="bg-black/50 rounded-lg p-6 mb-6">
+                                            <h3 className="font-bold mb-4 text-lg flex items-center gap-2">
+                                                <Icons.TrendingDown />
+                                                Financial Consequences (Automatic)
+                                            </h3>
+                                            <div className="grid md:grid-cols-2 gap-4 text-sm">
+                                                <div>
+                                                    <p className="font-semibold mb-2">FHRI Impact:</p>
+                                                    <ul className="space-y-1">
+                                                        <li>Score: 72 → 57 ("High Risk")</li>
+                                                        <li>Interest rate: +200 bps</li>
+                                                        <li>Cost: $2M/year increase</li>
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold mb-2">Restricted Payments:</p>
+                                                    <ul className="space-y-1">
+                                                        <li>Your bonus: $2M → $0 (frozen)</li>
+                                                        <li>All bonuses: Frozen</li>
+                                                        <li>Dividends: Frozen</li>
+                                                        <li>Until FHRI ≥ 65 restored</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-6">
+                                            <p className="text-lg mb-3">
+                                                <strong>The launch is scrubbed anyway.</strong> The 7 astronauts live.
+                                            </p>
+                                            <p className="mb-3">
+                                                But you personally lost $2M in frozen bonuses, damaged your reputation 
+                                                ("attempted unwarranted override"), and the company faces years of higher 
+                                                capital costs.
+                                            </p>
+                                            <p className="text-lg font-bold text-red-400">
+                                                Attempting to override safety = Financial penalty, even if disaster avoided.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {isFederationScrub && (
+                                <div className="space-y-6">
+                                    <div className="bg-green-900/50 border-2 border-green-500 rounded-xl p-8">
+                                        <h2 className="text-3xl font-bold mb-4 flex items-center gap-2">
+                                            <Icons.CheckCircle />
+                                            February 2, 1986 - Launch Success
+                                        </h2>
+                                        <p className="text-xl mb-6">
+                                            You accepted the Sortition Panel ruling. Launch delayed 5 days. 
+                                            At 40°F, <strong className="text-green-400">Challenger launches successfully</strong>.
+                                        </p>
+                                        <p className="text-2xl font-bold text-green-400 mb-6">
+                                            All 7 astronauts return safely.
+                                        </p>
+                                        
+                                        <div className="grid md:grid-cols-3 gap-4 mb-6">
+                                            <div className="bg-black/30 rounded-lg p-4">
+                                                <h3 className="font-bold mb-2 flex items-center gap-2">
+                                                    <Icons.TrendingUp />
+                                                    Your Outcome
+                                                </h3>
+                                                <ul className="space-y-1 text-sm">
+                                                    <li>Bonus: $2M (intact)</li>
+                                                    <li>Reputation: Enhanced</li>
+                                                    <li>Job: Secure</li>
+                                                    <li>Lesson learned: System prevents recklessness</li>
+                                                </ul>
+                                            </div>
+                                            <div className="bg-black/30 rounded-lg p-4">
+                                                <h3 className="font-bold mb-2 flex items-center gap-2">
+                                                    <Icons.Award />
+                                                    Boisjoly's Outcome
+                                                </h3>
+                                                <ul className="space-y-1 text-sm">
+                                                    <li>Safety Champion Award</li>
+                                                    <li>$50k bonus</li>
+                                                    <li>Rotation to Boeing (+15% pay)</li>
+                                                    <li>No PTSD, career advanced</li>
+                                                </ul>
+                                            </div>
+                                            <div className="bg-black/30 rounded-lg p-4">
+                                                <h3 className="font-bold mb-2 flex items-center gap-2">
+                                                    <Icons.DollarSign />
+                                                    Company Outcome
+                                                </h3>
+                                                <ul className="space-y-1 text-sm">
+                                                    <li>FHRI: 72 → 77 → 80</li>
+                                                    <li>Interest: -75 bps</li>
+                                                    <li>Savings: $2.65M/year</li>
+                                                    <li>Disaster avoided: $4.4B</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-black/50 rounded-lg p-6">
+                                            <p className="text-lg italic mb-4">
+                                                "I pressed the button. The system protected me. I saved lives and I sleep at night."
+                                            </p>
+                                            <p className="text-right text-sm opacity-75">— Roger Boisjoly (Federation timeline)</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-blue-900/30 border border-blue-500/50 rounded-xl p-6">
+                                        <h3 className="text-xl font-bold mb-3">This Was the Rational Decision</h3>
+                                        <p className="mb-3">
+                                            Under the Federation model, your expected value calculation made this obvious: 
+                                            Accept ruling = <strong>+$1.25M</strong> | Override = <strong>-$3.9M</strong>
+                                        </p>
+                                        <p className="mb-3">
+                                            You made the <strong>financially rational choice</strong>. The system aligned 
+                                            incentives with safety.
+                                        </p>
+                                        <p className="text-lg font-bold text-green-400">
+                                            You didn't need heroism. You just needed the right financial architecture.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Comparison section */}
+                            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-8 mt-8 border border-white/20">
+                                <h3 className="text-2xl font-bold mb-6 text-center">
+                                    {model === 'extractive' 
+                                        ? 'What if the Federation Model existed in 1986?' 
+                                        : 'What if the Extractive Model was still in place?'}
+                                </h3>
+                                <button
+                                    onClick={() => {
+                                        setModel(model === 'extractive' ? 'federation' : 'extractive');
+                                        setStage('decision');
+                                        setDecision(null);
+                                    }}
+                                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-all transform hover:scale-105"
+                                >
+                                    {model === 'extractive' 
+                                        ? '→ Try the Federation Model' 
+                                        : '→ See what actually happened (Extractive Model)'}
+                                </button>
+                            </div>
+
+                            {/* CTA section */}
+                            <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-xl p-8 mt-8 text-center">
+                                <h3 className="text-2xl font-bold mb-4">The Bottom Line</h3>
+                                <p className="text-lg mb-6">
+                                    Roger Boisjoly shouldn't have needed heroism. He should have needed a button to press.
+                                </p>
+                                <p className="text-xl font-bold mb-6">
+                                    The Polycentric Federation provides that button—and makes pressing it the profitable choice.
+                                </p>
+                                <div className="space-y-4">
+                                    <button className="bg-white text-blue-900 font-bold py-3 px-8 rounded-lg hover:bg-blue-50 transition-all">
+                                        Download Full Executive Summary
+                                    </button>
+                                    <p className="text-sm opacity-90">
+                                        Learn how this architecture prevents disasters across healthcare, construction, 
+                                        finance, and tech.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="text-center mt-8">
+                                <button
+                                    onClick={resetSim}
+                                    className="text-blue-300 hover:text-white underline"
+                                >
+                                    ← Start Over
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return null;
+        };
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ChallengerSimulator />);
+    </script>
 </body>
 </html>
